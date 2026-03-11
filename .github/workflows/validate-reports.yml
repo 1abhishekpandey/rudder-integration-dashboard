@@ -11,48 +11,33 @@ on:
       - 'output/**'
   workflow_dispatch:
 
-permissions:
-  contents: read
-  pull-requests: read
-
 jobs:
   validate-output:
     name: Validate Output Reports
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
     steps:
       - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
 
       - name: Validate output files
-        run: python3 scripts/validate_output.py
-
-  claude-review:
-    name: Claude Code Review
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-    steps:
-      - uses: actions/checkout@v4
+        uses: anthropics/claude-code-action@v1
         with:
-          fetch-depth: 0
-
-      - uses: anthropics/claude-code-action@v1
-        with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          prompt: |
-            Review ONLY the output/*_LEGACY.md files changed in this PR.
-            Validate every table has proper setup:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          direct_prompt: |
+            Read every file matching output/*_LEGACY.md and validate each one.
+            For each file, check:
 
             1. All markdown links [text](url) are well-formed — no broken brackets
             2. Every version number is a hyperlink pointing to the exact file and line
             3. Status icons (🟢/🔴/⚪) appear before brackets in range cells, e.g. 🟢 \[2.1.0,3.0.0)
             4. Table columns are consistent — header, separator, and data rows must have the same column count
-            5. URLs use correct domains: github.com, mvnrepository.com, npmjs.com, pub.dev
+            5. URLs use correct domains: github.com, mvnrepository.com, npmjs.com, pub.dev, firebase.google.com
             6. Native Integration table has both Android and iOS rows
             7. React Native and Flutter sections (when present) have all 10 required columns
             8. No empty cells where a version or link is expected (— is acceptable as intentional placeholder)
 
-            Do NOT review any other files. Focus solely on output file table integrity.
-            Flag any issues as specific, actionable comments on the relevant lines.
+            If ALL files pass validation, exit with code 0.
+            If ANY file has issues, print the specific errors and exit with code 1.
