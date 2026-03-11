@@ -1,0 +1,58 @@
+"""Integration registry mapping integration keys to platform configuration."""
+
+REGISTRY: dict = {
+    "braze": {
+        "display_name": "Braze",
+        "android": {
+            "repo":                  "rudderlabs/rudder-integration-braze-android",
+            "maven_group":           "com.rudderstack.android.integration",
+            "maven_artifact":        "braze",
+            "build_file":            "braze/build.gradle",
+            "vendor_group":          "com.braze",
+            "vendor_artifact":       "android-sdk-ui",
+            "vendor_repo":           "braze-inc/braze-android-sdk",
+            "vendor_version_file":   "build.gradle",
+        },
+        "ios": {
+            "repo":                  "rudderlabs/rudder-integration-braze-ios",
+            "pod":                   "Rudder-Braze",
+            "podspec_file":          "Rudder-Braze.podspec",
+            "package_json_file":     "package.json",
+            "vendor_pod":            "BrazeKit",
+            "vendor_gh_repo":        "braze-inc/braze-swift-sdk",
+            "vendor_version_file":   "BrazeKit.podspec",
+        },
+        "rn": {
+            "rudder_repo":                  "rudderlabs/rudder-sdk-react-native",
+            "rudder_pkg":                   "@rudderstack/rudder-integration-braze-react-native",
+            "rudder_android_file":          "libs/rudder-integration-braze-react-native/android/build.gradle",
+            "rudder_ios_file":              "libs/rudder-integration-braze-react-native/rudder-integration-braze-react-native.podspec",
+            "rudder_android_dep_group":     "com.rudderstack.android.integration",
+            "rudder_android_dep_artifact":  "braze",
+            "rudder_ios_dep_pod":           "Rudder-Braze",
+            "vendor_pkg":                   "@braze/react-native-sdk",
+            "vendor_repo":                  "braze-inc/braze-react-native-sdk",
+            "vendor_android_file":          "android/build.gradle",
+            "vendor_ios_file":              "braze-react-native-sdk.podspec",
+            "vendor_android_dep_group":     "com.braze",
+            "vendor_android_dep_artifact":  "android-sdk-ui",
+            "vendor_ios_dep_pod":           "BrazeKit",
+        },
+        "flutter": {
+            "rudder_repo":                  "rudderlabs/rudder-sdk-flutter",
+            "rudder_pkg":                   "rudder_integration_braze_flutter",
+            "rudder_android_file":          "packages/integrations/rudder_integration_braze_flutter/android/build.gradle",
+            "rudder_ios_file":              "packages/integrations/rudder_integration_braze_flutter/ios/rudder_integration_braze_flutter.podspec",
+            "rudder_android_dep_group":     "com.rudderstack.android.integration",
+            "rudder_android_dep_artifact":  "braze",
+            "rudder_ios_dep_pod":           "Rudder-Braze",
+            "vendor_pkg":                   "braze_plugin",
+            "vendor_repo":                  "braze-inc/braze-flutter-sdk",
+            "vendor_android_file":          "android/build.gradle",
+            "vendor_ios_file":              "ios/braze_plugin.podspec",
+            "vendor_android_dep_group":     "com.braze",
+            "vendor_android_dep_artifact":  "android-sdk-ui",
+            "vendor_ios_dep_pod":           "BrazeKit",
+        },
+    }
+}
