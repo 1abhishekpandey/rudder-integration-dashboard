@@ -47,7 +47,7 @@ class TestGenerateMarkdown(unittest.TestCase):
             "vendor_range": "[29.0,30.0)",
             "build_file_url": "https://github.com/rudderlabs/rudder-integration-braze-android/blob/master/build.gradle#L10",
             "latest_vendor": "29.5.0",
-            "latest_vendor_url": "https://mvnrepository.com/artifact/com.braze/android-sdk-ui/29.5.0",
+            "latest_vendor_url": "https://github.com/braze-inc/braze-android-sdk/blob/v29.5.0/build.gradle#L5",
         }
 
     def _make_ios_data(self):

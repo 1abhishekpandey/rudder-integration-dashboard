@@ -141,27 +141,28 @@ def generate_markdown(
     )
 
     # ── RN ─────────────────────────────────────────────────────────────────────
-    rn_pkg            = cfg["rn"]["rudder_pkg"]
-    rn_repo_url       = rn_data.get("rudder_repo_url")
-    rn_npm_ver_url    = rn_data.get("rudder_npm_version_url")
-    rn_ver            = str(rn_data.get("rudder_version") or "—")
-    rn_ver_url        = rn_data.get("rudder_pkg_json_url")
-    vendor_rn_pkg     = cfg["rn"]["vendor_pkg"]
-    vendor_rn_repo_url = rn_data.get("vendor_repo_url")
-    vendor_rn_npm_url = rn_data.get("vendor_npm_version_url")
-    vendor_rn_ver     = str(rn_data.get("vendor_version") or "—")
+    rn_combined = None
+    if cfg.get("rn") is not None:
+        rn_pkg            = cfg["rn"]["rudder_pkg"]
+        rn_repo_url       = rn_data.get("rudder_repo_url")
+        rn_npm_ver_url    = rn_data.get("rudder_npm_version_url")
+        rn_ver            = str(rn_data.get("rudder_version") or "—")
+        rn_ver_url        = rn_data.get("rudder_pkg_json_url")
+        vendor_rn_pkg     = cfg["rn"]["vendor_pkg"]
+        vendor_rn_repo_url = rn_data.get("vendor_repo_url")
+        vendor_rn_npm_url = rn_data.get("vendor_npm_version_url")
+        vendor_rn_ver     = str(rn_data.get("vendor_version") or "—")
+        vendor_rn_ver_url = rn_data.get("vendor_pkg_json_url")
 
-    vendor_rn_ver_url = rn_data.get("vendor_pkg_json_url")
-
-    rn_combined = rn_combined_row(
-        rn_pkg, rn_repo_url, rn_npm_ver_url, rn_ver, rn_ver_url,
-        rn_data.get("rudder_android_range"), rn_data.get("rudder_android_url"),
-        rn_data.get("rudder_ios_range"), rn_data.get("rudder_ios_url"),
-        android_data["version"], str(ios_data.get("version") or None),
-        vendor_rn_pkg, vendor_rn_repo_url, vendor_rn_npm_url, vendor_rn_ver, vendor_rn_ver_url,
-        rn_data.get("vendor_android_range"), rn_data.get("vendor_android_url"),
-        rn_data.get("vendor_ios_range"), rn_data.get("vendor_ios_url"),
-    )
+        rn_combined = rn_combined_row(
+            rn_pkg, rn_repo_url, rn_npm_ver_url, rn_ver, rn_ver_url,
+            rn_data.get("rudder_android_range"), rn_data.get("rudder_android_url"),
+            rn_data.get("rudder_ios_range"), rn_data.get("rudder_ios_url"),
+            android_data["version"], str(ios_data.get("version") or None),
+            vendor_rn_pkg, vendor_rn_repo_url, vendor_rn_npm_url, vendor_rn_ver, vendor_rn_ver_url,
+            rn_data.get("vendor_android_range"), rn_data.get("vendor_android_url"),
+            rn_data.get("vendor_ios_range"), rn_data.get("vendor_ios_url"),
+        )
 
     # ── Flutter ────────────────────────────────────────────────────────────────
     fl_pkg                = cfg["flutter"]["rudder_pkg"]
@@ -214,14 +215,21 @@ def generate_markdown(
         "",
         "---",
         "",
-        "# React Native SDK",
-        "",
-        rn_header,
-        rn_sep,
-        rn_combined,
-        "",
-        "---",
-        "",
+    ]
+
+    if rn_combined is not None:
+        sections += [
+            "# React Native SDK",
+            "",
+            rn_header,
+            rn_sep,
+            rn_combined,
+            "",
+            "---",
+            "",
+        ]
+
+    sections += [
         "# Flutter SDK",
         "",
         fl_header,
