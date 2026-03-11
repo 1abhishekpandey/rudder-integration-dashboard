@@ -1,4 +1,4 @@
-Firebase — Legacy SDK Research
+Adjust — Legacy SDK Research
 
 Data collected: 2026-03-12
 
@@ -6,15 +6,13 @@ Data collected: 2026-03-12
 
 | Platform | Rudder Integration | Rudder Integration Version | Build File | Vendor Version Range | Latest Vendor Version |
 | --- | --- | --- | --- | --- | --- |
-| Android | [rudder-integration-firebase-android](https://github.com/rudderlabs/rudder-integration-firebase-android) | [3.5.0](https://github.com/rudderlabs/rudder-integration-firebase-android/blob/master/package.json#L2) | [Gradle](https://mvnrepository.com/artifact/com.rudderstack.android.integration/firebase/3.5.0) | [33.16.0](https://github.com/rudderlabs/rudder-integration-firebase-android/blob/master/firebase/build.gradle#L35) | [🔴 34.10.0](https://firebase.google.com/support/release-notes/android) |
-| iOS | [rudder-integration-firebase-ios](https://github.com/rudderlabs/rudder-integration-firebase-ios) | [3.8.1](https://github.com/rudderlabs/rudder-integration-firebase-ios/blob/master/package.json#L2) | [Podspec](https://github.com/CocoaPods/Specs/blob/master/Specs/6/6/5/Rudder-Firebase/3.8.1/Rudder-Firebase.podspec.json) | [~> 11.15.0](https://github.com/rudderlabs/rudder-integration-firebase-ios/blob/master/Rudder-Firebase.podspec#L6) | [🔴 12.10.0](https://github.com/firebase/firebase-ios-sdk/blob/12.10.0/FirebaseAnalytics.podspec#L3) |
+| Android | [rudder-integration-adjust-android](https://github.com/rudderlabs/rudder-integration-adjust-android) | [2.1.0](https://github.com/rudderlabs/rudder-integration-adjust-android/blob/master/package.json#L2) | [Gradle](https://mvnrepository.com/artifact/com.rudderstack.android.integration/adjust/2.1.0) | [5.1.0](https://github.com/rudderlabs/rudder-integration-adjust-android/blob/master/adjust/build.gradle#L26) | [🔴 5.4.1](https://github.com/adjust/android_sdk/blob/v5.4.1/Adjust/build.gradle#L12) |
+| iOS | [rudder-integration-adjust-ios](https://github.com/rudderlabs/rudder-integration-adjust-ios) | [2.2.0](https://github.com/rudderlabs/rudder-integration-adjust-ios/blob/master/package.json#L2) | [Podspec](https://github.com/CocoaPods/Specs/blob/master/Specs/5/b/d/Rudder-Adjust/2.2.0/Rudder-Adjust.podspec.json) | [~> 5.1.0](https://github.com/rudderlabs/rudder-integration-adjust-ios/blob/master/Rudder-Adjust.podspec#L24) | [🟢 5.5.3](https://github.com/adjust/ios_sdk/blob/v5.5.3/Adjust.podspec#L4) |
 
 ---
 
-# React Native SDK
+# Flutter SDK
 
-| Rudder RN Integration SDK | npm | Version | Underlying Android SDK Range | Underlying iOS SDK Range | Vendor RN SDK | npm | Version | Vendor Underlying Android SDK Range | Vendor Underlying iOS SDK Range |
+| Rudder Flutter Integration SDK | pub | Version | Underlying Android SDK Range | Underlying iOS SDK Range | Vendor Flutter SDK | pub | Version | Vendor Underlying Android SDK Range | Vendor Underlying iOS SDK Range |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| [@rudderstack/rudder-integration-firebase-react-native](https://github.com/rudderlabs/rudder-sdk-react-native) | [npm](https://www.npmjs.com/package/@rudderstack/rudder-integration-firebase-react-native/v/2.2.0) | [2.2.0](https://github.com/rudderlabs/rudder-sdk-react-native/blob/master/libs/rudder-integration-firebase-react-native/package.json#L4) | [🟢 \[3.5.0,4.0)](https://github.com/rudderlabs/rudder-sdk-react-native/blob/master/libs/rudder-integration-firebase-react-native/android/build.gradle#L83) | [🟢 ~> 3.8](https://github.com/rudderlabs/rudder-sdk-react-native/blob/master/libs/rudder-integration-firebase-react-native/rudder-integration-firebase-react-native.podspec#L23) | [@react-native-firebase/analytics](https://github.com/invertase/react-native-firebase) | npm | — | — | — |
-
----
+| [rudder_integration_adjust_flutter](https://github.com/rudderlabs/rudder-sdk-flutter) | [pub](https://pub.dev/packages/rudder_integration_adjust_flutter/versions/2.3.1) | [2.3.1](https://github.com/rudderlabs/rudder-sdk-flutter/blob/main/packages/integrations/rudder_integration_adjust_flutter/pubspec.yaml#L3) | [🔴 1.0.1](https://github.com/rudderlabs/rudder-sdk-flutter/blob/main/packages/integrations/rudder_integration_adjust_flutter/android/build.gradle#L26) | [🔴 1.0.0](https://github.com/rudderlabs/rudder-sdk-flutter/blob/main/packages/integrations/rudder_integration_adjust_flutter/ios/rudder_integration_adjust_flutter.podspec#L20) | [adjust_sdk](https://github.com/adjust/flutter_sdk) | [pub](https://pub.dev/packages/adjust_sdk/versions/5.5.1) | [5.5.1](https://github.com/adjust/flutter_sdk/blob/master/pubspec.yaml#L4) | [5.5.1](https://github.com/adjust/flutter_sdk/blob/master/android/build.gradle#L31) | [5.5.3](https://github.com/adjust/flutter_sdk/blob/master/ios/adjust_sdk.podspec#L17) |
