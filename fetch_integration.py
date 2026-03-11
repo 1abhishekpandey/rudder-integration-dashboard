@@ -576,39 +576,37 @@ def _display_ios(d: dict) -> None:
     icon   = status_icon(d.get("vendor_range"), d.get("latest_vendor"))
     _row("Latest Vendor Version",      f"{icon} {latest}", d.get("latest_vendor_url"))
 
-def _display_rn(d: dict, cfg: dict) -> None:
-    for platform in ("Android", "iOS"):
-        _section(f"React Native — {platform}")
-        _row("Rudder RN Integration SDK",   link(cfg["rudder_pkg"], d["rudder_repo_url"]) if d.get("rudder_repo_url") else cfg["rudder_pkg"])
-        _row("npm",                         link("npm", d["rudder_npm_version_url"]) if d.get("rudder_npm_version_url") else link("npm", d.get("rudder_npm_url")) if d.get("rudder_npm_url") else "—")
-        _row("Rudder RN Version",           str(d.get("rudder_version") or "—"),     d.get("rudder_pkg_json_url"))
-        if platform == "Android":
-            _row("Underlying Android SDK Range", d.get("rudder_android_range") or "—", d.get("rudder_android_url"))
-        else:
-            _row("Underlying iOS SDK Range",    d.get("rudder_ios_range") or "—",     d.get("rudder_ios_url"))
-        _row("Vendor RN SDK",               link(cfg["vendor_pkg"], d["vendor_repo_url"]) if d.get("vendor_repo_url") else cfg["vendor_pkg"])
-        _row("npm",                         link("npm", d["vendor_npm_version_url"]) if d.get("vendor_npm_version_url") else link("npm", d.get("vendor_npm_url")) if d.get("vendor_npm_url") else "—")
-        _row("Vendor RN Latest Version",    str(d.get("vendor_version") or "—"), d.get("vendor_pkg_json_url"))
-        if platform == "Android":
-            _row("Vendor Underlying Android",   d.get("vendor_android_range") or "—", d.get("vendor_android_url"))
-        else:
-            _row("Vendor Underlying iOS",       d.get("vendor_ios_range") or "—",     d.get("vendor_ios_url"))
+def _display_rn(d: dict, cfg: dict, android_native_ver: Optional[str], ios_native_ver: Optional[str]) -> None:
+    def _icon_range(range_val: Optional[str], native_ver: Optional[str]) -> str:
+        icon = status_icon(range_val, native_ver)
+        return f"{icon} {range_val}" if range_val else "—"
 
-def _display_flutter(d: dict, cfg: dict) -> None:
-    for platform in ("Android", "iOS"):
-        _section(f"Flutter — {platform}")
-        _row("Rudder Flutter Integration SDK", cfg["rudder_pkg"],          d.get("rudder_pub_url"))
-        _row("Rudder Flutter Version",         str(d.get("rudder_version") or "—"))
-        if platform == "Android":
-            _row("Underlying Android SDK Range", d.get("rudder_android_range") or "—", d.get("rudder_android_url"))
-        else:
-            _row("Underlying iOS SDK Range",    d.get("rudder_ios_range") or "—",      d.get("rudder_ios_url"))
-        _row("Vendor Flutter SDK",             cfg["vendor_pkg"],          d.get("vendor_pub_url"))
-        _row("Vendor Flutter Latest Version",  str(d.get("vendor_version") or "—"))
-        if platform == "Android":
-            _row("Vendor Underlying Android",   d.get("vendor_android_range") or "—", d.get("vendor_android_url"))
-        else:
-            _row("Vendor Underlying iOS",       d.get("vendor_ios_range") or "—",     d.get("vendor_ios_url"))
+    _section("React Native")
+    _row("Rudder RN Integration SDK",    link(cfg["rudder_pkg"], d["rudder_repo_url"]) if d.get("rudder_repo_url") else cfg["rudder_pkg"])
+    _row("npm",                          link("npm", d["rudder_npm_version_url"]) if d.get("rudder_npm_version_url") else link("npm", d.get("rudder_npm_url")) if d.get("rudder_npm_url") else "—")
+    _row("Rudder RN Version",            str(d.get("rudder_version") or "—"),                                   d.get("rudder_pkg_json_url"))
+    _row("Underlying Android SDK Range", _icon_range(d.get("rudder_android_range"), android_native_ver),        d.get("rudder_android_url"))
+    _row("Underlying iOS SDK Range",     _icon_range(d.get("rudder_ios_range"), ios_native_ver),                d.get("rudder_ios_url"))
+    _row("Vendor RN SDK",                link(cfg["vendor_pkg"], d["vendor_repo_url"]) if d.get("vendor_repo_url") else cfg["vendor_pkg"])
+    _row("npm",                          link("npm", d["vendor_npm_version_url"]) if d.get("vendor_npm_version_url") else link("npm", d.get("vendor_npm_url")) if d.get("vendor_npm_url") else "—")
+    _row("Vendor RN Latest Version",     str(d.get("vendor_version") or "—"),                                   d.get("vendor_pkg_json_url"))
+    _row("Vendor Underlying Android",    d.get("vendor_android_range") or "—",                                  d.get("vendor_android_url"))
+    _row("Vendor Underlying iOS",        d.get("vendor_ios_range") or "—",                                      d.get("vendor_ios_url"))
+
+def _display_flutter(d: dict, cfg: dict, android_native_ver: Optional[str], ios_native_ver: Optional[str]) -> None:
+    def _icon_range(range_val: Optional[str], native_ver: Optional[str]) -> str:
+        icon = status_icon(range_val, native_ver)
+        return f"{icon} {range_val}" if range_val else "—"
+
+    _section("Flutter")
+    _row("Rudder Flutter Integration SDK",  cfg["rudder_pkg"],                                                      d.get("rudder_pub_url"))
+    _row("Rudder Flutter Version",          str(d.get("rudder_version") or "—"))
+    _row("Underlying Android SDK Range",    _icon_range(d.get("rudder_android_range"), android_native_ver),         d.get("rudder_android_url"))
+    _row("Underlying iOS SDK Range",        _icon_range(d.get("rudder_ios_range"), ios_native_ver),                 d.get("rudder_ios_url"))
+    _row("Vendor Flutter SDK",              cfg["vendor_pkg"],                                                      d.get("vendor_pub_url"))
+    _row("Vendor Flutter Latest Version",   str(d.get("vendor_version") or "—"))
+    _row("Vendor Underlying Android",       d.get("vendor_android_range") or "—",                                   d.get("vendor_android_url"))
+    _row("Vendor Underlying iOS",           d.get("vendor_ios_range") or "—",                                       d.get("vendor_ios_url"))
 
 # ── Interactive prompts ────────────────────────────────────────────────────────
 
@@ -678,47 +676,67 @@ def generate_markdown(
             f"| {_ml(vendor_range or '—', vendor_range_url)} |"
         )
 
-    def rn_row(rudder_pkg: str, rudder_repo_url: Optional[str],
-               rudder_npm_ver_url: Optional[str],
-               rudder_ver: str, rudder_ver_url: Optional[str],
-               rudder_range: Optional[str], rudder_range_url: Optional[str],
-               vendor_pkg: str, vendor_repo_url: Optional[str],
-               vendor_npm_ver_url: Optional[str],
-               vendor_ver: str, vendor_ver_url: Optional[str],
-               vendor_range: Optional[str], vendor_range_url: Optional[str]) -> str:
+    def _range_cell(range_val: Optional[str], range_url: Optional[str], native_ver: Optional[str]) -> str:
+        """Format a Rudder underlying SDK range cell with a status icon."""
+        icon = status_icon(range_val, native_ver)
+        text = f"{icon} {range_val}" if range_val else "—"
+        return _ml(text, range_url)
+
+    def rn_combined_row(
+        rudder_pkg: str, rudder_repo_url: Optional[str],
+        rudder_npm_ver_url: Optional[str],
+        rudder_ver: str, rudder_ver_url: Optional[str],
+        rudder_android_range: Optional[str], rudder_android_url: Optional[str],
+        rudder_ios_range: Optional[str], rudder_ios_url: Optional[str],
+        android_native_ver: Optional[str], ios_native_ver: Optional[str],
+        vendor_pkg: str, vendor_repo_url: Optional[str],
+        vendor_npm_ver_url: Optional[str],
+        vendor_ver: str, vendor_ver_url: Optional[str],
+        vendor_android_range: Optional[str], vendor_android_url: Optional[str],
+        vendor_ios_range: Optional[str], vendor_ios_url: Optional[str],
+    ) -> str:
         return (
             f"| {_ml(rudder_pkg, rudder_repo_url)} "
             f"| {_ml('npm', rudder_npm_ver_url)} "
             f"| {_ml(rudder_ver, rudder_ver_url)} "
-            f"| {_ml(rudder_range or '—', rudder_range_url)} "
+            f"| {_range_cell(rudder_android_range, rudder_android_url, android_native_ver)} "
+            f"| {_range_cell(rudder_ios_range, rudder_ios_url, ios_native_ver)} "
             f"| {_ml(vendor_pkg, vendor_repo_url)} "
             f"| {_ml('npm', vendor_npm_ver_url)} "
             f"| {_ml(vendor_ver, vendor_ver_url)} "
-            f"| {_ml(vendor_range or '—', vendor_range_url)} |"
+            f"| {_ml(vendor_android_range or '—', vendor_android_url)} "
+            f"| {_ml(vendor_ios_range or '—', vendor_ios_url)} |"
         )
 
-    def flutter_row(rudder_pkg: str, rudder_repo_url: Optional[str],
-                    rudder_pub_ver_url: Optional[str],
-                    rudder_ver: str, rudder_ver_url: Optional[str],
-                    rudder_range: Optional[str], rudder_range_url: Optional[str],
-                    vendor_pkg: str, vendor_repo_url: Optional[str],
-                    vendor_pub_ver_url: Optional[str],
-                    vendor_ver: str, vendor_ver_url: Optional[str],
-                    vendor_range: Optional[str], vendor_range_url: Optional[str]) -> str:
+    def flutter_combined_row(
+        rudder_pkg: str, rudder_repo_url: Optional[str],
+        rudder_pub_ver_url: Optional[str],
+        rudder_ver: str, rudder_ver_url: Optional[str],
+        rudder_android_range: Optional[str], rudder_android_url: Optional[str],
+        rudder_ios_range: Optional[str], rudder_ios_url: Optional[str],
+        android_native_ver: Optional[str], ios_native_ver: Optional[str],
+        vendor_pkg: str, vendor_repo_url: Optional[str],
+        vendor_pub_ver_url: Optional[str],
+        vendor_ver: str, vendor_ver_url: Optional[str],
+        vendor_android_range: Optional[str], vendor_android_url: Optional[str],
+        vendor_ios_range: Optional[str], vendor_ios_url: Optional[str],
+    ) -> str:
         return (
             f"| {_ml(rudder_pkg, rudder_repo_url)} "
             f"| {_ml('pub', rudder_pub_ver_url)} "
             f"| {_ml(rudder_ver, rudder_ver_url)} "
-            f"| {_ml(rudder_range or '—', rudder_range_url)} "
+            f"| {_range_cell(rudder_android_range, rudder_android_url, android_native_ver)} "
+            f"| {_range_cell(rudder_ios_range, rudder_ios_url, ios_native_ver)} "
             f"| {_ml(vendor_pkg, vendor_repo_url)} "
             f"| {_ml('pub', vendor_pub_ver_url)} "
             f"| {_ml(vendor_ver, vendor_ver_url)} "
-            f"| {_ml(vendor_range or '—', vendor_range_url)} |"
+            f"| {_ml(vendor_android_range or '—', vendor_android_url)} "
+            f"| {_ml(vendor_ios_range or '—', vendor_ios_url)} |"
         )
 
     sep     = "| --- | --- | --- | --- | --- | --- |"
-    rn_sep  = "| --- | --- | --- | --- | --- | --- | --- | --- |"
-    fl_sep  = "| --- | --- | --- | --- | --- | --- | --- | --- |"
+    rn_sep  = "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |"
+    fl_sep  = "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |"
 
     # ── Native Integration ─────────────────────────────────────────────────────
     android_row = native_row(
@@ -753,16 +771,13 @@ def generate_markdown(
 
     vendor_rn_ver_url = rn_data.get("vendor_pkg_json_url")
 
-    rn_android_row = rn_row(
+    rn_combined = rn_combined_row(
         rn_pkg, rn_repo_url, rn_npm_ver_url, rn_ver, rn_ver_url,
         rn_data.get("rudder_android_range"), rn_data.get("rudder_android_url"),
+        rn_data.get("rudder_ios_range"), rn_data.get("rudder_ios_url"),
+        android_data["version"], str(ios_data.get("version") or None),
         vendor_rn_pkg, vendor_rn_repo_url, vendor_rn_npm_url, vendor_rn_ver, vendor_rn_ver_url,
         rn_data.get("vendor_android_range"), rn_data.get("vendor_android_url"),
-    )
-    rn_ios_row = rn_row(
-        rn_pkg, rn_repo_url, rn_npm_ver_url, rn_ver, rn_ver_url,
-        rn_data.get("rudder_ios_range"), rn_data.get("rudder_ios_url"),
-        vendor_rn_pkg, vendor_rn_repo_url, vendor_rn_npm_url, vendor_rn_ver, vendor_rn_ver_url,
         rn_data.get("vendor_ios_range"), rn_data.get("vendor_ios_url"),
     )
 
@@ -778,25 +793,30 @@ def generate_markdown(
     vendor_fl_ver         = str(flutter_data.get("vendor_version") or "—")
     vendor_fl_ver_url     = flutter_data.get("vendor_pubspec_url")
 
-    fl_android_row = flutter_row(
+    fl_combined = flutter_combined_row(
         fl_pkg, fl_repo_url, fl_pub_ver_url, fl_ver, fl_ver_url,
         flutter_data.get("rudder_android_range"), flutter_data.get("rudder_android_url"),
+        flutter_data.get("rudder_ios_range"), flutter_data.get("rudder_ios_url"),
+        android_data["version"], str(ios_data.get("version") or None),
         vendor_fl_pkg, vendor_fl_repo_url, vendor_fl_pub_ver_url, vendor_fl_ver, vendor_fl_ver_url,
         flutter_data.get("vendor_android_range"), flutter_data.get("vendor_android_url"),
-    )
-    fl_ios_row = flutter_row(
-        fl_pkg, fl_repo_url, fl_pub_ver_url, fl_ver, fl_ver_url,
-        flutter_data.get("rudder_ios_range"), flutter_data.get("rudder_ios_url"),
-        vendor_fl_pkg, vendor_fl_repo_url, vendor_fl_pub_ver_url, vendor_fl_ver, vendor_fl_ver_url,
         flutter_data.get("vendor_ios_range"), flutter_data.get("vendor_ios_url"),
     )
 
     native_header = "| Platform | Rudder Integration | Rudder Integration Version | Build File | Vendor Version Range | Latest Vendor Version |"
     native_sep    = "| --- | --- | --- | --- | --- | --- |"
-    cp_header_android = "| Rudder RN Integration SDK | npm | Rudder RN Integration Version | Rudder RN Integration Underlying Android SDK Version Range | Vendor RN SDK | npm | Vendor RN SDK Latest Version | Vendor RN SDK Underlying Android SDK Version Range |"
-    cp_header_ios     = "| Rudder RN Integration SDK | npm | Rudder RN Integration Version | Rudder RN Integration Underlying iOS SDK Version Range | Vendor RN SDK | npm | Vendor RN SDK Latest Version | Vendor RN SDK Underlying iOS SDK Version Range |"
-    fl_header_android = "| Rudder Flutter Integration SDK | pub | Rudder Flutter Integration Version | Rudder Flutter Integration Underlying Android SDK Version Range | Vendor Flutter SDK | pub | Vendor Flutter SDK Latest Version | Vendor Flutter SDK Underlying Android SDK Version Range |"
-    fl_header_ios     = "| Rudder Flutter Integration SDK | pub | Rudder Flutter Integration Version | Rudder Flutter Integration Underlying iOS SDK Version Range | Vendor Flutter SDK | pub | Vendor Flutter SDK Latest Version | Vendor Flutter SDK Underlying iOS SDK Version Range |"
+    rn_header = (
+        "| Rudder RN Integration SDK | npm | Version "
+        "| Underlying Android SDK Range | Underlying iOS SDK Range "
+        "| Vendor RN SDK | npm | Version "
+        "| Vendor Underlying Android SDK Range | Vendor Underlying iOS SDK Range |"
+    )
+    fl_header = (
+        "| Rudder Flutter Integration SDK | pub | Version "
+        "| Underlying Android SDK Range | Underlying iOS SDK Range "
+        "| Vendor Flutter SDK | pub | Version "
+        "| Vendor Underlying Android SDK Range | Vendor Underlying iOS SDK Range |"
+    )
 
     sections = [
         f"{name} — Legacy SDK Research",
@@ -812,31 +832,19 @@ def generate_markdown(
         "",
         "---",
         "",
-        "# React Native SDK — Android",
+        "# React Native SDK",
         "",
-        cp_header_android,
+        rn_header,
         rn_sep,
-        rn_android_row,
-        "",
-        "# React Native SDK — iOS",
-        "",
-        cp_header_ios,
-        rn_sep,
-        rn_ios_row,
+        rn_combined,
         "",
         "---",
         "",
-        "# Flutter SDK — Android",
+        "# Flutter SDK",
         "",
-        fl_header_android,
+        fl_header,
         fl_sep,
-        fl_android_row,
-        "",
-        "# Flutter SDK — iOS",
-        "",
-        fl_header_ios,
-        fl_sep,
-        fl_ios_row,
+        fl_combined,
         "",
     ]
     return "\n".join(sections)
@@ -900,8 +908,8 @@ def main() -> None:
 
     _display_android(android_data)
     _display_ios(ios_data)
-    _display_rn(rn_data, cfg["rn"])
-    _display_flutter(flutter_data, cfg["flutter"])
+    _display_rn(rn_data, cfg["rn"], android_data["version"], str(ios_data.get("version") or None))
+    _display_flutter(flutter_data, cfg["flutter"], android_data["version"], str(ios_data.get("version") or None))
 
     print()
     print(dim("  " + border))
