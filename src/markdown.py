@@ -165,26 +165,28 @@ def generate_markdown(
         )
 
     # ── Flutter ────────────────────────────────────────────────────────────────
-    fl_pkg                = cfg["flutter"]["rudder_pkg"]
-    fl_repo_url           = flutter_data.get("rudder_repo_url")
-    fl_pub_ver_url        = flutter_data.get("rudder_pub_version_url")
-    fl_ver                = str(flutter_data.get("rudder_version") or "—")
-    fl_ver_url            = flutter_data.get("rudder_pubspec_url")
-    vendor_fl_pkg         = cfg["flutter"]["vendor_pkg"]
-    vendor_fl_repo_url    = flutter_data.get("vendor_repo_url")
-    vendor_fl_pub_ver_url = flutter_data.get("vendor_pub_version_url")
-    vendor_fl_ver         = str(flutter_data.get("vendor_version") or "—")
-    vendor_fl_ver_url     = flutter_data.get("vendor_pubspec_url")
+    fl_combined = None
+    if cfg.get("flutter") is not None:
+        fl_pkg                = cfg["flutter"]["rudder_pkg"]
+        fl_repo_url           = flutter_data.get("rudder_repo_url")
+        fl_pub_ver_url        = flutter_data.get("rudder_pub_version_url")
+        fl_ver                = str(flutter_data.get("rudder_version") or "—")
+        fl_ver_url            = flutter_data.get("rudder_pubspec_url")
+        vendor_fl_pkg         = cfg["flutter"]["vendor_pkg"]
+        vendor_fl_repo_url    = flutter_data.get("vendor_repo_url")
+        vendor_fl_pub_ver_url = flutter_data.get("vendor_pub_version_url")
+        vendor_fl_ver         = str(flutter_data.get("vendor_version") or "—")
+        vendor_fl_ver_url     = flutter_data.get("vendor_pubspec_url")
 
-    fl_combined = flutter_combined_row(
-        fl_pkg, fl_repo_url, fl_pub_ver_url, fl_ver, fl_ver_url,
-        flutter_data.get("rudder_android_range"), flutter_data.get("rudder_android_url"),
-        flutter_data.get("rudder_ios_range"), flutter_data.get("rudder_ios_url"),
-        android_data["version"], str(ios_data.get("version") or None),
-        vendor_fl_pkg, vendor_fl_repo_url, vendor_fl_pub_ver_url, vendor_fl_ver, vendor_fl_ver_url,
-        flutter_data.get("vendor_android_range"), flutter_data.get("vendor_android_url"),
-        flutter_data.get("vendor_ios_range"), flutter_data.get("vendor_ios_url"),
-    )
+        fl_combined = flutter_combined_row(
+            fl_pkg, fl_repo_url, fl_pub_ver_url, fl_ver, fl_ver_url,
+            flutter_data.get("rudder_android_range"), flutter_data.get("rudder_android_url"),
+            flutter_data.get("rudder_ios_range"), flutter_data.get("rudder_ios_url"),
+            android_data["version"], str(ios_data.get("version") or None),
+            vendor_fl_pkg, vendor_fl_repo_url, vendor_fl_pub_ver_url, vendor_fl_ver, vendor_fl_ver_url,
+            flutter_data.get("vendor_android_range"), flutter_data.get("vendor_android_url"),
+            flutter_data.get("vendor_ios_range"), flutter_data.get("vendor_ios_url"),
+        )
 
     native_header = "| Platform | Rudder Integration | Rudder Integration Version | Build File | Vendor Version Range | Latest Vendor Version |"
     native_sep    = "| --- | --- | --- | --- | --- | --- |"
@@ -229,14 +231,15 @@ def generate_markdown(
             "",
         ]
 
-    sections += [
-        "# Flutter SDK",
-        "",
-        fl_header,
-        fl_sep,
-        fl_combined,
-        "",
-    ]
+    if fl_combined is not None:
+        sections += [
+            "# Flutter SDK",
+            "",
+            fl_header,
+            fl_sep,
+            fl_combined,
+            "",
+        ]
     return "\n".join(sections)
 
 

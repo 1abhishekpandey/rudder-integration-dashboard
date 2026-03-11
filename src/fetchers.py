@@ -8,7 +8,7 @@ from typing import Optional
 from src.http_client import get_text
 from src.parsers import find_line, find_version_value_line, gradle_dep, podspec_dep, podspec_version
 from src.url_builders import blob_url, cocoapods_specs_url, mvnrepository_url
-from src.packages import maven_latest, npm_latest, pubdev_latest, cocoapods_latest, github_release_latest
+from src.packages import maven_latest, google_maven_latest, npm_latest, pubdev_latest, cocoapods_latest, github_release_latest
 
 
 def gh_raw(repo: str, ref: str, path: str) -> Optional[str]:
@@ -70,6 +70,9 @@ def fetch_android(cfg: dict, version: str) -> dict:
         out["version_url"] = blob_url(repo, ref_pkg, "package.json") + f"#L{line}"
     latest = maven_latest(cfg["vendor_group"], cfg["vendor_artifact"])
     out["latest_vendor"] = latest
+    if not latest and cfg.get("vendor_maven_repo") == "google":
+        latest = google_maven_latest(cfg["vendor_group"], cfg["vendor_artifact"])
+        out["latest_vendor"] = latest
     if latest and cfg.get("vendor_repo") and cfg.get("vendor_version_file"):
         vc, ref_vc = gh_raw_at_version(cfg["vendor_repo"], latest, cfg["vendor_version_file"])
         if vc:
@@ -78,6 +81,8 @@ def fetch_android(cfg: dict, version: str) -> dict:
                 print(f"\n  ERROR: Could not find version '{latest}' in {cfg['vendor_repo']}/{cfg['vendor_version_file']}", file=sys.stderr)
                 sys.exit(1)
             out["latest_vendor_url"] = blob_url(cfg["vendor_repo"], ref_vc, cfg["vendor_version_file"]) + f"#L{line}"
+    elif latest and cfg.get("vendor_latest_url"):
+        out["latest_vendor_url"] = cfg["vendor_latest_url"]
     return out
 
 

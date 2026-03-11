@@ -53,11 +53,11 @@ def main() -> None:
         fut_android  = pool.submit(fetch_android,  acfg,         version)
         fut_ios      = pool.submit(fetch_ios,       cfg["ios"])
         fut_rn       = pool.submit(fetch_rn,        cfg["rn"]) if cfg.get("rn") is not None else None
-        fut_flutter  = pool.submit(fetch_flutter,   cfg["flutter"])
+        fut_flutter  = pool.submit(fetch_flutter,   cfg["flutter"]) if cfg.get("flutter") is not None else None
         android_data = fut_android.result()
         ios_data     = fut_ios.result()
         rn_data      = fut_rn.result() if fut_rn is not None else {}
-        flutter_data = fut_flutter.result()
+        flutter_data = fut_flutter.result() if fut_flutter is not None else {}
     print(" done.\n")
 
     # 4. Render
@@ -70,7 +70,8 @@ def main() -> None:
     _display_ios(ios_data)
     if cfg.get("rn") is not None:
         _display_rn(rn_data, cfg["rn"], android_data["version"], str(ios_data.get("version") or None))
-    _display_flutter(flutter_data, cfg["flutter"], android_data["version"], str(ios_data.get("version") or None))
+    if cfg.get("flutter") is not None:
+        _display_flutter(flutter_data, cfg["flutter"], android_data["version"], str(ios_data.get("version") or None))
 
     print()
     print(dim("  " + border))
