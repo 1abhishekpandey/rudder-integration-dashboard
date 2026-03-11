@@ -472,10 +472,25 @@ def fetch_rn(cfg: dict) -> dict:
 
 def fetch_flutter(cfg: dict) -> dict:
     out: dict = {}
-    out["rudder_version"] = pubdev_latest(cfg["rudder_pkg"])
     out["rudder_pub_url"] = f"https://pub.dev/packages/{cfg['rudder_pkg']}"
 
     rudder_repo = cfg["rudder_repo"]
+    out["rudder_repo_url"] = f"https://github.com/{rudder_repo}"
+
+    # Read version from pubspec.yaml inside the monorepo
+    pubspec_path = "/".join(cfg["rudder_android_file"].split("/")[:-2]) + "/pubspec.yaml"
+    pubspec, ref_pubspec = gh_raw_default(rudder_repo, pubspec_path)
+    if pubspec:
+        m = re.search(r'^version:\s*(\S+)', pubspec, re.MULTILINE)
+        if m:
+            rudder_version = m.group(1)
+            out["rudder_version"] = rudder_version
+            line = find_line(pubspec, r'^version:')
+            out["rudder_pubspec_url"] = blob_url(rudder_repo, ref_pubspec, pubspec_path) + (f"#L{line}" if line else "")
+            out["rudder_pub_version_url"] = f"https://pub.dev/packages/{cfg['rudder_pkg']}/versions/{rudder_version}"
+    if "rudder_version" not in out:
+        out["rudder_version"] = pubdev_latest(cfg["rudder_pkg"])
+
     ac, ref_ac = gh_raw_default(rudder_repo, cfg["rudder_android_file"])
     if ac:
         rudder_android_range = gradle_dep(ac, cfg["rudder_android_dep_group"], cfg["rudder_android_dep_artifact"])
@@ -492,8 +507,24 @@ def fetch_flutter(cfg: dict) -> dict:
         out["rudder_ios_url"] = base + (f"#L{line}" if line else "")
 
     vendor_repo = cfg["vendor_repo"]
-    out["vendor_version"] = pubdev_latest(cfg["vendor_pkg"])
+    out["vendor_repo_url"] = f"https://github.com/{vendor_repo}"
     out["vendor_pub_url"] = f"https://pub.dev/packages/{cfg['vendor_pkg']}"
+
+    # Read vendor version from pubspec.yaml (root of vendor repo)
+    vendor_pubspec_path_parts = "/".join(cfg["vendor_android_file"].split("/")[:-2]).strip("/")
+    vendor_pubspec_path = (vendor_pubspec_path_parts + "/pubspec.yaml") if vendor_pubspec_path_parts else "pubspec.yaml"
+    vpubspec, ref_vpubspec = gh_raw_default(vendor_repo, vendor_pubspec_path)
+    if vpubspec:
+        m = re.search(r'^version:\s*(\S+)', vpubspec, re.MULTILINE)
+        if m:
+            vendor_version = m.group(1)
+            out["vendor_version"] = vendor_version
+            line = find_line(vpubspec, r'^version:')
+            out["vendor_pubspec_url"] = blob_url(vendor_repo, ref_vpubspec, vendor_pubspec_path) + (f"#L{line}" if line else "")
+            out["vendor_pub_version_url"] = f"https://pub.dev/packages/{cfg['vendor_pkg']}/versions/{vendor_version}"
+    if "vendor_version" not in out:
+        out["vendor_version"] = pubdev_latest(cfg["vendor_pkg"])
+
     vac, ref_vac = gh_raw_default(vendor_repo, cfg["vendor_android_file"])
     if vac:
         vendor_android_range = gradle_dep(vac, cfg["vendor_android_dep_group"], cfg["vendor_android_dep_artifact"])
@@ -666,8 +697,28 @@ def generate_markdown(
             f"| {_ml(vendor_range or '—', vendor_range_url)} |"
         )
 
+    def flutter_row(rudder_pkg: str, rudder_repo_url: Optional[str],
+                    rudder_pub_ver_url: Optional[str],
+                    rudder_ver: str, rudder_ver_url: Optional[str],
+                    rudder_range: Optional[str], rudder_range_url: Optional[str],
+                    vendor_pkg: str, vendor_repo_url: Optional[str],
+                    vendor_pub_ver_url: Optional[str],
+                    vendor_ver: str, vendor_ver_url: Optional[str],
+                    vendor_range: Optional[str], vendor_range_url: Optional[str]) -> str:
+        return (
+            f"| {_ml(rudder_pkg, rudder_repo_url)} "
+            f"| {_ml('pub', rudder_pub_ver_url)} "
+            f"| {_ml(rudder_ver, rudder_ver_url)} "
+            f"| {_ml(rudder_range or '—', rudder_range_url)} "
+            f"| {_ml(vendor_pkg, vendor_repo_url)} "
+            f"| {_ml('pub', vendor_pub_ver_url)} "
+            f"| {_ml(vendor_ver, vendor_ver_url)} "
+            f"| {_ml(vendor_range or '—', vendor_range_url)} |"
+        )
+
     sep     = "| --- | --- | --- | --- | --- | --- |"
     rn_sep  = "| --- | --- | --- | --- | --- | --- | --- | --- |"
+    fl_sep  = "| --- | --- | --- | --- | --- | --- | --- | --- |"
 
     # ── Native Integration ─────────────────────────────────────────────────────
     android_row = native_row(
@@ -716,23 +767,27 @@ def generate_markdown(
     )
 
     # ── Flutter ────────────────────────────────────────────────────────────────
-    fl_pkg        = cfg["flutter"]["rudder_pkg"]
-    fl_pub_url    = flutter_data.get("rudder_pub_url")
-    fl_ver        = str(flutter_data.get("rudder_version") or "—")
-    vendor_fl_pkg = cfg["flutter"]["vendor_pkg"]
-    vendor_fl_url = flutter_data.get("vendor_pub_url")
-    vendor_fl_ver = str(flutter_data.get("vendor_version") or "—")
+    fl_pkg                = cfg["flutter"]["rudder_pkg"]
+    fl_repo_url           = flutter_data.get("rudder_repo_url")
+    fl_pub_ver_url        = flutter_data.get("rudder_pub_version_url")
+    fl_ver                = str(flutter_data.get("rudder_version") or "—")
+    fl_ver_url            = flutter_data.get("rudder_pubspec_url")
+    vendor_fl_pkg         = cfg["flutter"]["vendor_pkg"]
+    vendor_fl_repo_url    = flutter_data.get("vendor_repo_url")
+    vendor_fl_pub_ver_url = flutter_data.get("vendor_pub_version_url")
+    vendor_fl_ver         = str(flutter_data.get("vendor_version") or "—")
+    vendor_fl_ver_url     = flutter_data.get("vendor_pubspec_url")
 
-    fl_android_row = cp_row(
-        fl_pkg, fl_pub_url, fl_ver,
+    fl_android_row = flutter_row(
+        fl_pkg, fl_repo_url, fl_pub_ver_url, fl_ver, fl_ver_url,
         flutter_data.get("rudder_android_range"), flutter_data.get("rudder_android_url"),
-        vendor_fl_pkg, vendor_fl_url, vendor_fl_ver,
+        vendor_fl_pkg, vendor_fl_repo_url, vendor_fl_pub_ver_url, vendor_fl_ver, vendor_fl_ver_url,
         flutter_data.get("vendor_android_range"), flutter_data.get("vendor_android_url"),
     )
-    fl_ios_row = cp_row(
-        fl_pkg, fl_pub_url, fl_ver,
+    fl_ios_row = flutter_row(
+        fl_pkg, fl_repo_url, fl_pub_ver_url, fl_ver, fl_ver_url,
         flutter_data.get("rudder_ios_range"), flutter_data.get("rudder_ios_url"),
-        vendor_fl_pkg, vendor_fl_url, vendor_fl_ver,
+        vendor_fl_pkg, vendor_fl_repo_url, vendor_fl_pub_ver_url, vendor_fl_ver, vendor_fl_ver_url,
         flutter_data.get("vendor_ios_range"), flutter_data.get("vendor_ios_url"),
     )
 
@@ -740,8 +795,8 @@ def generate_markdown(
     native_sep    = "| --- | --- | --- | --- | --- | --- |"
     cp_header_android = "| Rudder RN Integration SDK | npm | Rudder RN Integration Version | Rudder RN Integration Underlying Android SDK Version Range | Vendor RN SDK | npm | Vendor RN SDK Latest Version | Vendor RN SDK Underlying Android SDK Version Range |"
     cp_header_ios     = "| Rudder RN Integration SDK | npm | Rudder RN Integration Version | Rudder RN Integration Underlying iOS SDK Version Range | Vendor RN SDK | npm | Vendor RN SDK Latest Version | Vendor RN SDK Underlying iOS SDK Version Range |"
-    fl_header_android = "| Rudder Flutter Integration SDK | Rudder Flutter Integration Version | Rudder Flutter Integration Underlying Android SDK Version Range | Vendor Flutter SDK | Vendor Flutter SDK Latest Version | Vendor Flutter SDK Underlying Android SDK Version Range |"
-    fl_header_ios     = "| Rudder Flutter Integration SDK | Rudder Flutter Integration Version | Rudder Flutter Integration Underlying iOS SDK Version Range | Vendor Flutter SDK | Vendor Flutter SDK Latest Version | Vendor Flutter SDK Underlying iOS SDK Version Range |"
+    fl_header_android = "| Rudder Flutter Integration SDK | pub | Rudder Flutter Integration Version | Rudder Flutter Integration Underlying Android SDK Version Range | Vendor Flutter SDK | pub | Vendor Flutter SDK Latest Version | Vendor Flutter SDK Underlying Android SDK Version Range |"
+    fl_header_ios     = "| Rudder Flutter Integration SDK | pub | Rudder Flutter Integration Version | Rudder Flutter Integration Underlying iOS SDK Version Range | Vendor Flutter SDK | pub | Vendor Flutter SDK Latest Version | Vendor Flutter SDK Underlying iOS SDK Version Range |"
 
     sections = [
         f"{name} — Legacy SDK Research",
@@ -774,13 +829,13 @@ def generate_markdown(
         "# Flutter SDK — Android",
         "",
         fl_header_android,
-        sep,
+        fl_sep,
         fl_android_row,
         "",
         "# Flutter SDK — iOS",
         "",
         fl_header_ios,
-        sep,
+        fl_sep,
         fl_ios_row,
         "",
     ]

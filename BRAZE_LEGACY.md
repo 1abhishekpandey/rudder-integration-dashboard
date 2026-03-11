@@ -27,12 +27,12 @@ Data collected: 2026-03-12
 
 # Flutter SDK — Android
 
-| Rudder Flutter Integration SDK | Rudder Flutter Integration Version | Rudder Flutter Integration Underlying Android SDK Version Range | Vendor Flutter SDK | Vendor Flutter SDK Latest Version | Vendor Flutter SDK Underlying Android SDK Version Range |
-| --- | --- | --- | --- | --- | --- |
-| [rudder_integration_braze_flutter](https://pub.dev/packages/rudder_integration_braze_flutter) | 2.6.1 | [\[2.1.0,3.0.0)](https://github.com/rudderlabs/rudder-sdk-flutter/blob/main/packages/integrations/rudder_integration_braze_flutter/android/build.gradle#L41) | [braze_plugin](https://pub.dev/packages/braze_plugin) | 17.1.0 | [41.1.1](https://github.com/braze-inc/braze-flutter-sdk/blob/main/android/build.gradle#L78) |
+| Rudder Flutter Integration SDK | pub | Rudder Flutter Integration Version | Rudder Flutter Integration Underlying Android SDK Version Range | Vendor Flutter SDK | pub | Vendor Flutter SDK Latest Version | Vendor Flutter SDK Underlying Android SDK Version Range |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| [rudder_integration_braze_flutter](https://github.com/rudderlabs/rudder-sdk-flutter) | [pub](https://pub.dev/packages/rudder_integration_braze_flutter/versions/2.6.1) | [2.6.1](https://github.com/rudderlabs/rudder-sdk-flutter/blob/main/packages/integrations/rudder_integration_braze_flutter/pubspec.yaml#L3) | [\[2.1.0,3.0.0)](https://github.com/rudderlabs/rudder-sdk-flutter/blob/main/packages/integrations/rudder_integration_braze_flutter/android/build.gradle#L41) | [braze_plugin](https://github.com/braze-inc/braze-flutter-sdk) | [pub](https://pub.dev/packages/braze_plugin/versions/17.1.0) | [17.1.0](https://github.com/braze-inc/braze-flutter-sdk/blob/main/pubspec.yaml#L3) | [41.1.1](https://github.com/braze-inc/braze-flutter-sdk/blob/main/android/build.gradle#L78) |
 
 # Flutter SDK — iOS
 
-| Rudder Flutter Integration SDK | Rudder Flutter Integration Version | Rudder Flutter Integration Underlying iOS SDK Version Range | Vendor Flutter SDK | Vendor Flutter SDK Latest Version | Vendor Flutter SDK Underlying iOS SDK Version Range |
-| --- | --- | --- | --- | --- | --- |
-| [rudder_integration_braze_flutter](https://pub.dev/packages/rudder_integration_braze_flutter) | 2.6.1 | [~> 4.3](https://github.com/rudderlabs/rudder-sdk-flutter/blob/main/packages/integrations/rudder_integration_braze_flutter/ios/rudder_integration_braze_flutter.podspec#L21) | [braze_plugin](https://pub.dev/packages/braze_plugin) | 17.1.0 | [~> 14.0.1](https://github.com/braze-inc/braze-flutter-sdk/blob/main/ios/braze_plugin.podspec#L10) |
+| Rudder Flutter Integration SDK | pub | Rudder Flutter Integration Version | Rudder Flutter Integration Underlying iOS SDK Version Range | Vendor Flutter SDK | pub | Vendor Flutter SDK Latest Version | Vendor Flutter SDK Underlying iOS SDK Version Range |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| [rudder_integration_braze_flutter](https://github.com/rudderlabs/rudder-sdk-flutter) | [pub](https://pub.dev/packages/rudder_integration_braze_flutter/versions/2.6.1) | [2.6.1](https://github.com/rudderlabs/rudder-sdk-flutter/blob/main/packages/integrations/rudder_integration_braze_flutter/pubspec.yaml#L3) | [~> 4.3](https://github.com/rudderlabs/rudder-sdk-flutter/blob/main/packages/integrations/rudder_integration_braze_flutter/ios/rudder_integration_braze_flutter.podspec#L21) | [braze_plugin](https://github.com/braze-inc/braze-flutter-sdk) | [pub](https://pub.dev/packages/braze_plugin/versions/17.1.0) | [17.1.0](https://github.com/braze-inc/braze-flutter-sdk/blob/main/pubspec.yaml#L3) | [~> 14.0.1](https://github.com/braze-inc/braze-flutter-sdk/blob/main/ios/braze_plugin.podspec#L10) |
