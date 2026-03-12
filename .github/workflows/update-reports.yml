@@ -39,6 +39,31 @@ jobs:
         run: |
           git diff --quiet output/ && echo "changed=false" >> "$GITHUB_OUTPUT" || echo "changed=true" >> "$GITHUB_OUTPUT"
 
+      - name: Build PR description
+        if: steps.changes.outputs.changed == 'true'
+        id: pr_body
+        run: |
+          BODY="## Summary\n\nAutomated daily update of integration version reports.\n\n## Changed files\n\n"
+          for file in output/*_LEGACY.md; do
+            [ -f "$file" ] || continue
+            name=$(basename "$file")
+            if git diff --quiet "$file" 2>/dev/null; then
+              continue
+            fi
+            BODY+="### $name\n\n"
+            BODY+="\`\`\`diff\n"
+            BODY+="$(git diff "$file")\n"
+            BODY+="\`\`\`\n\n"
+          done
+          # Handle new untracked files
+          for file in $(git ls-files --others --exclude-standard output/); do
+            name=$(basename "$file")
+            BODY+="### $name (new)\n\n"
+            BODY+="New report added.\n\n"
+          done
+          # Write to a temp file to avoid shell escaping issues
+          echo -e "$BODY" > /tmp/pr_body.md
+
       - name: Create PR if changes detected
         if: steps.changes.outputs.changed == 'true'
         env:
@@ -59,4 +84,4 @@ jobs:
             --base develop \
             --head "$BRANCH" \
             --title "chore: update integration reports $(date +%Y-%m-%d)" \
-            --body "Automated daily update of integration version reports."
+            --body-file /tmp/pr_body.md
