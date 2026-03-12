@@ -70,6 +70,27 @@ def podspec_dep(content: str, pod: str) -> Optional[str]:
         vm = re.search(rf"""{re.escape(var)}\s*=\s*['"]([^'"]+)['"]""", content)
         if vm:
             return _resolve_ruby(content, vm.group(1).strip())
+    # Variable pod name: var = 'PodName' ... s.dependency var, version_or_var
+    m3 = re.search(rf"""(\w+)\s*=\s*['"]?{re.escape(pod)}['"]?""", content)
+    if m3:
+        pod_var = m3.group(1)
+        # Look for dependency using that variable, with literal version
+        m4 = re.search(
+            rf"""dependency\s+{re.escape(pod_var)}\s*,\s*['"]([^'"]+)['"]""",
+            content
+        )
+        if m4:
+            return _resolve_ruby(content, m4.group(1).strip())
+        # Look for dependency using that variable, with variable version
+        m5 = re.search(
+            rf"""dependency\s+{re.escape(pod_var)}\s*,\s*(\w+)""",
+            content
+        )
+        if m5:
+            ver_var = m5.group(1)
+            vm = re.search(rf"""{re.escape(ver_var)}\s*=\s*['"]([^'"]+)['"]""", content)
+            if vm:
+                return _resolve_ruby(content, vm.group(1).strip())
     return None
 
 

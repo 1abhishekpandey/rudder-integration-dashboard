@@ -31,6 +31,18 @@ def maven_latest(group: str, artifact: str) -> Optional[str]:
     return docs[0].get("latestVersion") if docs else None
 
 
+def google_maven_latest(group: str, artifact: str) -> Optional[str]:
+    """Fetch latest version from Google's Maven repository (dl.google.com)."""
+    group_path = group.replace(".", "/")
+    xml = get_text(f"https://dl.google.com/android/maven2/{group_path}/{artifact}/maven-metadata.xml")
+    if not xml:
+        return None
+    m = re.search(r'<latest>([^<]+)</latest>', xml)
+    if not m:
+        m = re.search(r'<release>([^<]+)</release>', xml)
+    return m.group(1).strip() if m else None
+
+
 def npm_latest(package: str) -> Optional[str]:
     enc = package.replace("@", "%40").replace("/", "%2F")
     d = get_json(f"https://registry.npmjs.org/{enc}/latest")
