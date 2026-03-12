@@ -11,18 +11,29 @@ from src.url_builders import blob_url, cocoapods_specs_url, mvnrepository_url
 from src.packages import maven_latest, google_maven_latest, npm_latest, pubdev_latest, cocoapods_latest, github_release_latest
 
 
+def _json_dotpath(data: dict, path: str):
+    """Extract a value from a nested dict using a dot-separated key path."""
+    for key in path.split("."):
+        if not isinstance(data, dict):
+            return None
+        data = data.get(key)
+    return data
+
+
 def gh_raw(repo: str, ref: str, path: str) -> Optional[str]:
     return get_text(f"https://raw.githubusercontent.com/{repo}/{ref}/{path}")
 
 
-def gh_raw_at_version(repo: str, version: str, path: str) -> tuple[Optional[str], str]:
+
+
+def _gh_raw_at_version(repo: str, version: str, path: str) -> tuple[Optional[str], str]:
     """Fetch a file at the tag matching a version (tries v{version} then {version}).
-    Falls back to the default branch. Returns (content, ref_used)."""
+    Returns (content, ref_used) or (None, None) if not found."""
     for ref in (f"v{version}", version):
         content = gh_raw(repo, ref, path)
         if content:
             return content, ref
-    return gh_raw_default(repo, path)
+    return None, None
 
 
 def gh_raw_default(repo: str, path: str) -> tuple[Optional[str], str]:
@@ -74,13 +85,18 @@ def fetch_android(cfg: dict, version: str) -> dict:
         latest = google_maven_latest(cfg["vendor_group"], cfg["vendor_artifact"])
         out["latest_vendor"] = latest
     if latest and cfg.get("vendor_repo") and cfg.get("vendor_version_file"):
-        vc, ref_vc = gh_raw_at_version(cfg["vendor_repo"], latest, cfg["vendor_version_file"])
+        vc, ref_vc = gh_raw_default(cfg["vendor_repo"], cfg["vendor_version_file"])
         if vc:
             line = find_version_value_line(vc, latest)
-            if not line:
-                print(f"\n  ERROR: Could not find version '{latest}' in {cfg['vendor_repo']}/{cfg['vendor_version_file']}", file=sys.stderr)
-                sys.exit(1)
-            out["latest_vendor_url"] = blob_url(cfg["vendor_repo"], ref_vc, cfg["vendor_version_file"]) + f"#L{line}"
+            if line:
+                out["latest_vendor_url"] = blob_url(cfg["vendor_repo"], ref_vc, cfg["vendor_version_file"]) + f"#L{line}"
+            else:
+                tag_vc, tag_ref = _gh_raw_at_version(cfg["vendor_repo"], latest, cfg["vendor_version_file"])
+                if tag_vc and tag_ref:
+                    tag_line = find_version_value_line(tag_vc, latest)
+                    if tag_line:
+                        out["latest_vendor_url"] = blob_url(cfg["vendor_repo"], tag_ref, cfg["vendor_version_file"]) + f"#L{tag_line}"
+                        out["latest_vendor_url_is_tag"] = True
     elif latest and cfg.get("vendor_latest_url"):
         out["latest_vendor_url"] = cfg["vendor_latest_url"]
     return out
@@ -126,13 +142,18 @@ def fetch_ios(cfg: dict) -> dict:
         latest = github_release_latest(cfg["vendor_gh_repo"])
     out["latest_vendor"] = latest
     if latest and cfg.get("vendor_gh_repo") and cfg.get("vendor_version_file"):
-        vc, ref_vc = gh_raw_at_version(cfg["vendor_gh_repo"], latest, cfg["vendor_version_file"])
+        vc, ref_vc = gh_raw_default(cfg["vendor_gh_repo"], cfg["vendor_version_file"])
         if vc:
             line = find_version_value_line(vc, latest)
-            if not line:
-                print(f"\n  ERROR: Could not find version '{latest}' in {cfg['vendor_gh_repo']}/{cfg['vendor_version_file']}", file=sys.stderr)
-                sys.exit(1)
-            out["latest_vendor_url"] = blob_url(cfg["vendor_gh_repo"], ref_vc, cfg["vendor_version_file"]) + f"#L{line}"
+            if line:
+                out["latest_vendor_url"] = blob_url(cfg["vendor_gh_repo"], ref_vc, cfg["vendor_version_file"]) + f"#L{line}"
+            else:
+                tag_vc, tag_ref = _gh_raw_at_version(cfg["vendor_gh_repo"], latest, cfg["vendor_version_file"])
+                if tag_vc and tag_ref:
+                    tag_line = find_version_value_line(tag_vc, latest)
+                    if tag_line:
+                        out["latest_vendor_url"] = blob_url(cfg["vendor_gh_repo"], tag_ref, cfg["vendor_version_file"]) + f"#L{tag_line}"
+                        out["latest_vendor_url_is_tag"] = True
     return out
 
 
@@ -194,16 +215,17 @@ def fetch_rn(cfg: dict) -> dict:
     out["vendor_npm_url"]  = f"https://www.npmjs.com/package/{cfg['vendor_pkg']}"
 
     # Read vendor version from package.json so the link points to the source file
-    vpkg, ref_vpkg = gh_raw_default(vendor_repo, "package.json")
+    vendor_pkg_json_path = cfg.get("vendor_package_json_path", "package.json")
+    vpkg, ref_vpkg = gh_raw_default(vendor_repo, vendor_pkg_json_path)
     if vpkg:
         try:
             vendor_version = json.loads(vpkg).get("version")
             out["vendor_version"] = vendor_version
             line = find_line(vpkg, r'"version"')
             if not line:
-                print(f"\n  ERROR: Could not find 'version' field in {vendor_repo}/package.json", file=sys.stderr)
+                print(f"\n  ERROR: Could not find 'version' field in {vendor_repo}/{vendor_pkg_json_path}", file=sys.stderr)
                 sys.exit(1)
-            out["vendor_pkg_json_url"] = blob_url(vendor_repo, ref_vpkg, "package.json") + f"#L{line}"
+            out["vendor_pkg_json_url"] = blob_url(vendor_repo, ref_vpkg, vendor_pkg_json_path) + f"#L{line}"
             if vendor_version:
                 out["vendor_npm_version_url"] = f"https://www.npmjs.com/package/{cfg['vendor_pkg']}/v/{vendor_version}"
         except Exception:
@@ -237,6 +259,32 @@ def fetch_rn(cfg: dict) -> dict:
             out["vendor_ios_url"] = base + f"#L{line}"
         else:
             out["vendor_ios_url"] = base
+
+    # Monorepo fallback: read SDK versions from a central JSON file
+    if cfg.get("vendor_versions_json_file") and (
+        not out.get("vendor_android_range") or not out.get("vendor_ios_range")
+    ):
+        vjson, ref_vjson = gh_raw_default(vendor_repo, cfg["vendor_versions_json_file"])
+        if vjson:
+            try:
+                data = json.loads(vjson)
+                base_url = blob_url(vendor_repo, ref_vjson, cfg["vendor_versions_json_file"])
+                if not out.get("vendor_android_range") and cfg.get("vendor_android_sdk_version_key"):
+                    ver = _json_dotpath(data, cfg["vendor_android_sdk_version_key"])
+                    if ver:
+                        out["vendor_android_range"] = str(ver)
+                        line = find_line(vjson, re.escape(str(ver)))
+                        if line:
+                            out["vendor_android_url"] = base_url + f"#L{line}"
+                if not out.get("vendor_ios_range") and cfg.get("vendor_ios_sdk_version_key"):
+                    ver = _json_dotpath(data, cfg["vendor_ios_sdk_version_key"])
+                    if ver:
+                        out["vendor_ios_range"] = str(ver)
+                        line = find_line(vjson, re.escape(str(ver)))
+                        if line:
+                            out["vendor_ios_url"] = base_url + f"#L{line}"
+            except json.JSONDecodeError:
+                pass
     return out
 
 

@@ -121,6 +121,8 @@ def generate_markdown(
     fl_sep  = "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |"
 
     # ── Native Integration ─────────────────────────────────────────────────────
+    android_latest = android_data.get("latest_vendor")
+    android_latest_suffix = " †" if android_data.get("latest_vendor_url_is_tag") else ""
     android_row = native_row(
         "Android",
         android_data["repo"], android_data["repo_url"],
@@ -128,8 +130,10 @@ def generate_markdown(
         android_data.get("version_url"),
         "Gradle", android_data.get("maven_url"),
         android_data.get("vendor_range"), android_data.get("build_file_url"),
-        android_data.get("latest_vendor"), android_data.get("latest_vendor_url"),
+        (f"{android_latest}{android_latest_suffix}" if android_latest else None), android_data.get("latest_vendor_url"),
     )
+    ios_latest = ios_data.get("latest_vendor")
+    ios_latest_suffix = " †" if ios_data.get("latest_vendor_url_is_tag") else ""
     ios_row = native_row(
         "iOS",
         ios_data["repo"], ios_data["repo_url"],
@@ -137,7 +141,7 @@ def generate_markdown(
         ios_data.get("version_url"),
         "Podspec", ios_data.get("cocoapods_specs_url"),
         ios_data.get("vendor_range"), ios_data.get("podspec_url"),
-        ios_data.get("latest_vendor"), ios_data.get("latest_vendor_url"),
+        (f"{ios_latest}{ios_latest_suffix}" if ios_latest else None), ios_data.get("latest_vendor_url"),
     )
 
     # ── RN ─────────────────────────────────────────────────────────────────────
@@ -203,6 +207,8 @@ def generate_markdown(
         "| Vendor Underlying Android SDK Range | Vendor Underlying iOS SDK Range |"
     )
 
+    has_tag_footnote = android_data.get("latest_vendor_url_is_tag") or ios_data.get("latest_vendor_url_is_tag")
+
     sections = [
         f"{name} — Legacy SDK Research",
         "",
@@ -214,6 +220,13 @@ def generate_markdown(
         native_sep,
         android_row,
         ios_row,
+    ]
+
+    if has_tag_footnote:
+        sections.append("")
+        sections.append("† Version link points to a specific git tag because the default branch has a newer unreleased version.")
+
+    sections += [
         "",
         "---",
         "",
