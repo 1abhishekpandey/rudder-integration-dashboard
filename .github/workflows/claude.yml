@@ -34,23 +34,45 @@ jobs:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           track_progress: true
           prompt: |
-            Read every file matching output/*_LEGACY.md and validate each one.
-            For each file, check:
+            Read every file matching output/*_LEGACY.md and validate each one against these rules:
 
-            1. All markdown links [text](url) are well-formed — no broken brackets
-            2. Every version number is a hyperlink pointing to the exact file and line
-            3. Status icons (🟢/🔴/⚪) appear before brackets in range cells, e.g. 🟢 \[2.1.0,3.0.0)
-            4. Table columns are consistent — header, separator, and data rows must have the same column count
-            5. URLs use correct domains: github.com, mvnrepository.com, npmjs.com, pub.dev, firebase.google.com
-            6. Native Integration table has both Android and iOS rows
-            7. React Native and Flutter sections (when present) have all 10 required columns
-            8. No empty cells where a version or link is expected (— is acceptable as intentional placeholder)
+            RULE 1 — Links must have non-empty URLs
+              Every [text](url) must have a non-empty url. Flag any [text]() with an empty URL.
 
-            When done, post a comment on this pull request summarising the validation results.
-            List any errors found per file, or confirm all files passed.
+            RULE 2 — Version numbers must be hyperlinks
+              Every standalone version number (e.g. 3.5.0, 2.1.1) in a table cell must be wrapped
+              in a [version](url) link pointing to the exact file and line on GitHub.
 
-            If ALL files pass validation, exit with code 0.
-            If ANY file has issues, print the specific errors and exit with code 1.
+            RULE 3 — Status icon required before every range cell
+              Any cell containing a version range (Maven bracket notation like \[x,y) or ~> x.y)
+              must begin with a status icon: 🟢, 🔴, or ⚪. Flag any range cell missing the icon.
+
+            RULE 4 — Table column counts must be consistent
+              The header row, separator row, and every data row in a table must have the same
+              number of columns. Flag any row that differs from the header column count.
+
+            RULE 5 — URLs must use allowed domains only
+              Every URL must use one of: github.com, mvnrepository.com, npmjs.com, pub.dev,
+              firebase.google.com. Flag any URL using a different domain.
+
+            RULE 6 — Native Integration table must have Android and iOS rows
+              The "# Native Integration" section must contain exactly one Android row and one iOS row.
+
+            RULE 7 — React Native and Flutter tables must have exactly 10 columns
+              Any table under "# React Native SDK" or "# Flutter SDK" must have exactly 10 columns.
+
+            RULE 8 — No empty cells in version or link columns
+              Table cells must not be completely empty. A dash — is acceptable as an intentional
+              placeholder. Flag cells that are blank.
+
+            For each issue found, post an inline review comment on the exact line in the file
+            where the problem occurs, quoting the offending content and stating which rule it violates.
+
+            After all inline comments, post a single summary comment on the PR with:
+            - A table showing each file, its pass/fail status, and the number of issues found
+            - A brief description of each issue grouped by file
+
+            Exit code 0 if all files pass. Exit code 1 if any file has issues.
 
   claude-assistant:
     name: Claude Assistant
