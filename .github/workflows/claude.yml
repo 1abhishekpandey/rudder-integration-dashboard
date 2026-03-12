@@ -35,21 +35,68 @@ jobs:
           track_progress: true
           include_fix_links: false
           prompt: |
-            Validate every file matching output/*_LEGACY.md against these rules:
+            Validate every file matching output/*_LEGACY.md using the rules below.
+            Read each file carefully line by line before checking.
 
-            RULE 1 — No empty URLs: every [text](url) must have a non-empty url. [text]() is a violation.
-            RULE 2 — Version numbers must be hyperlinks: every version string (e.g. 3.5.0) in a table cell must be a [version](url) link.
-            RULE 3 — Status icon before every range cell: any cell with \[x,y) or ~> x.y notation must start with 🟢, 🔴, or ⚪.
-            RULE 4 — Consistent column counts: header, separator, and all data rows in a table must have the same column count.
-            RULE 5 — Allowed domains only: every URL must use github.com, mvnrepository.com, npmjs.com, pub.dev, or firebase.google.com.
-            RULE 6 — Native table must have Android and iOS rows.
-            RULE 7 — React Native and Flutter tables must have exactly 10 columns.
-            RULE 8 — No blank cells: empty table cells are violations (— is acceptable as a placeholder).
+            === DOCUMENT STRUCTURE ===
+            RULE 1: Line 1 must be plain text (e.g. "Braze — Legacy SDK Research"), NOT a markdown heading.
+            RULE 2: Line 3 must be "Data collected: YYYY-MM-DD".
+            RULE 3: Every file must have a "# Native Integration" section.
+                    "# React Native SDK" and "# Flutter SDK" sections are optional.
+
+            === NATIVE INTEGRATION TABLE (6 columns) ===
+            Header: Platform | Rudder Integration | Rudder Integration Version | Build File | Vendor Version Range | Latest Vendor Version
+
+            RULE 4: Must have exactly one Android row and one iOS row. Platform cell = plain text "Android" or "iOS".
+            RULE 5 (col 2 — Rudder Integration): repo name linked to https://github.com/rudderlabs/
+            RULE 6 (col 3 — Rudder Integration Version): [x.y.z](https://github.com/rudderlabs/.../blob/...#Lnn)
+                    URL must point to a GitHub blob with a line anchor (#Lnn). Version must be a link.
+            RULE 7 (col 4 — Build File):
+                    Android row: [Gradle](https://mvnrepository.com/artifact/...) — non-empty mvnrepository URL
+                    iOS row: [Podspec](https://github.com/CocoaPods/Specs/...) — non-empty CocoaPods Specs URL
+            RULE 8 (col 5 — Vendor Version Range): version or ~> constraint linked to exact build file line.
+                    NO status icon expected here. Format: [x.y.z](github.com/.../build.gradle#Lnn)
+            RULE 9 (col 6 — Latest Vendor Version): status icon INSIDE the link label.
+                    Format: [🟢/🔴/⚪ x.y.z](url) — the icon is part of the link text, not outside.
+                    Optional: may include a † marker, e.g. [🔴 x.y.z †](url). That is valid.
+
+            === REACT NATIVE SDK TABLE (10 columns) ===
+            Header: Rudder RN Integration SDK | npm | Version | Underlying Android SDK Range | Underlying iOS SDK Range | Vendor RN SDK | npm | Version | Vendor Underlying Android SDK Range | Vendor Underlying iOS SDK Range
+
+            RULE 10 (col 1): scoped package name linked to https://github.com/rudderlabs/rudder-sdk-react-native
+            RULE 11 (col 2 — npm): text "npm" linked to https://www.npmjs.com/package/.../v/x.y.z (specific version URL)
+            RULE 12 (col 3 — Version): [x.y.z](github.com/.../package.json#Lnn)
+            RULE 13 (col 4 — Underlying Android SDK Range): status icon INSIDE link label required.
+                    Format: [🟢/🔴/⚪ \[x,y)](url) or [🟢/🔴/⚪ x.y.z](url). Missing icon is a violation.
+            RULE 14 (col 5 — Underlying iOS SDK Range): status icon INSIDE link label required.
+                    Format: [🟢/🔴/⚪ ~> x.y](url) or [🟢/🔴/⚪ x.y.z](url). Missing icon is a violation.
+            RULE 15 (col 6 — Vendor RN SDK): vendor package name linked to vendor's GitHub repo.
+            RULE 16 (col 7 — vendor npm): text "npm" linked to https://www.npmjs.com/package/.../v/x.y.z
+            RULE 17 (col 8 — vendor Version): [x.y.z](github.com/vendor/.../package.json#Lnn)
+            RULE 18 (cols 9 & 10 — Vendor Underlying ranges): version or range linked to exact line. NO status icon required.
+
+            === FLUTTER SDK TABLE (10 columns) ===
+            Same structure as React Native but uses "pub" instead of "npm":
+            RULE 19 (col 1): package name linked to https://github.com/rudderlabs/rudder-sdk-flutter
+            RULE 20 (col 2 — pub): text "pub" linked to https://pub.dev/packages/.../versions/x.y.z
+            RULE 21 (col 3 — Version): [x.y.z](github.com/.../pubspec.yaml#Lnn)
+            RULE 22 (cols 4 & 5): same as RULE 13 & 14 — status icon inside link label required.
+            RULE 23 (col 7 — vendor pub): text "pub" linked to https://pub.dev/packages/.../versions/x.y.z
+            RULE 24 (col 8 — vendor Version): [x.y.z](github.com/vendor/.../pubspec.yaml#Lnn)
+            RULE 25 (cols 9 & 10): version linked to exact line. NO status icon required.
+
+            === GENERAL RULES (all tables) ===
+            RULE 26: Every [text](url) must have a non-empty URL. [text]() is always a violation.
+            RULE 27: All URLs must be https://.
+            RULE 28: URLs must use only these domains: github.com, mvnrepository.com, www.npmjs.com, pub.dev, firebase.google.com.
+            RULE 29: GitHub links for versions must include a line anchor: #Lnn. A link to a file without #Lnn is a violation.
+            RULE 30: Table column count must be consistent — header, separator, and every data row must match.
+            RULE 31: No blank table cells. A — (em dash) is an acceptable placeholder; a truly empty cell is a violation.
 
             Post one summary PR comment with:
             - A table: File | Status | Issues Found
-            - One line per violation: file name, line number, rule violated, and exactly what to fix
-            - Do NOT include meta-commentary, commit hashes, "Fix this" links, or notes about why errors exist
+            - For each violation: file name, line number, rule number, offending content, and what needs to change
+            - Do NOT include meta-commentary, commit hashes, or notes about why errors exist
 
             Exit 0 if all files pass. Exit 1 if any file has violations.
 
