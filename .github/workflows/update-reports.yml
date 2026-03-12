@@ -1,0 +1,58 @@
+name: Update Integration Reports
+
+on:
+  schedule:
+    - cron: '30 4 * * *'  # 10:00 AM IST (UTC+5:30) = 04:30 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-reports:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout develop
+        uses: actions/checkout@v4
+        with:
+          ref: develop
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run script for each integration
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          for integration in $(python3 -c "from src.registry import REGISTRY; print(' '.join(REGISTRY.keys()))"); do
+            echo "::group::Running $integration"
+            echo "1" | python3 -m src "$integration"
+            echo "::endgroup::"
+          done
+
+      - name: Check for changes
+        id: changes
+        run: |
+          git diff --quiet output/ && echo "changed=false" >> "$GITHUB_OUTPUT" || echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Create PR if changes detected
+        if: steps.changes.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BRANCH="chore/update-reports-$(date +%Y%m%d)"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          git add output/
+          git commit -m "chore: update integration reports $(date +%Y-%m-%d)"
+          git push -u origin "$BRANCH"
+          gh pr create \
+            --base develop \
+            --head "$BRANCH" \
+            --title "chore: update integration reports $(date +%Y-%m-%d)" \
+            --body "Automated daily update of integration version reports."
