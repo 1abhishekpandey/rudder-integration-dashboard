@@ -33,6 +33,7 @@ jobs:
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           track_progress: true
+          include_fix_links: false
           prompt: |
             Validate every file matching output/*_LEGACY.md against these rules:
 
@@ -45,21 +46,10 @@ jobs:
             RULE 7 — React Native and Flutter tables must have exactly 10 columns.
             RULE 8 — No blank cells: empty table cells are violations (— is acceptable as a placeholder).
 
-            For EACH violation found, post an inline PR review comment using the gh CLI:
-              gh api repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/comments \
-                -f body="RULE X violated: <quote the offending content and explain the fix>" \
-                -f commit_id="$(git rev-parse HEAD)" \
-                -f path="<relative file path, e.g. output/FIREBASE_LEGACY.md>" \
-                -F line=<line number> \
-                -f side="RIGHT"
-
-            After posting all inline comments, post one summary PR comment using:
-              gh pr comment ${{ github.event.pull_request.number }} --body "<summary>"
-
-            The summary must contain only:
+            Post one summary PR comment with:
             - A table: File | Status | Issues Found
-            - One line per violation: file, line number, rule, and what to fix
-            - Do NOT include meta-commentary, commit hashes, or reasons why errors exist
+            - One line per violation: file name, line number, rule violated, and exactly what to fix
+            - Do NOT include meta-commentary, commit hashes, "Fix this" links, or notes about why errors exist
 
             Exit 0 if all files pass. Exit 1 if any file has violations.
 
