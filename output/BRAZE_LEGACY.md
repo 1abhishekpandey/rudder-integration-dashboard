@@ -1,13 +1,13 @@
 Braze — Legacy SDK Research
 
-Data collected: 2026-03-12
+Data collected: 2026-03-19
 
 # Native Integration
 
 | Platform | Rudder Integration | Rudder Integration Version | Build File | Vendor Version Range | Latest Vendor Version |
 | --- | --- | --- | --- | --- | --- |
-| Android | [rudder-integration-braze-android](https://github.com/rudderlabs/rudder-integration-braze-android) | [2.1.1](https://github.com/rudderlabs/rudder-integration-braze-android/blob/master/package.json#L2) | [Gradle](https://mvnrepository.com/artifact/com.rudderstack.android.integration/braze/2.1.1) | [35.0.0](https://github.com/rudderlabs/rudder-integration-braze-android/blob/master/braze/build.gradle#L32) | [🔴 36.0.0 †](https://github.com/braze-inc/braze-android-sdk/blob/v36.0.0/build.gradle#L27) |
-| iOS | [rudder-integration-braze-ios](https://github.com/rudderlabs/rudder-integration-braze-ios) | [4.3.0](https://github.com/rudderlabs/rudder-integration-braze-ios/blob/master/package.json#L2) | [Podspec](https://github.com/CocoaPods/Specs/blob/master/Specs/e/1/2/Rudder-Braze/4.3.0/Rudder-Braze.podspec.json) | [~> 13.3](https://github.com/rudderlabs/rudder-integration-braze-ios/blob/master/Rudder-Braze.podspec#L5) | [🔴 14.0.3](https://github.com/braze-inc/braze-swift-sdk/blob/main/BrazeKit.podspec#L3) |
+| Android | [rudder-integration-braze-android](https://github.com/rudderlabs/rudder-integration-braze-android) | [2.2.0](https://github.com/rudderlabs/rudder-integration-braze-android/blob/master/package.json#L2) | [Gradle](https://mvnrepository.com/artifact/com.rudderstack.android.integration/braze/2.2.0) | [\[41.1.1,42.0.0)](https://github.com/rudderlabs/rudder-integration-braze-android/blob/master/braze/build.gradle#L32) | [🔴 36.0.0 †](https://github.com/braze-inc/braze-android-sdk/blob/v36.0.0/build.gradle#L27) |
+| iOS | [rudder-integration-braze-ios](https://github.com/rudderlabs/rudder-integration-braze-ios) | [4.4.0](https://github.com/rudderlabs/rudder-integration-braze-ios/blob/master/package.json#L2) | [Podspec](https://github.com/CocoaPods/Specs/blob/master/Specs/e/1/2/Rudder-Braze/4.4.0/Rudder-Braze.podspec.json) | — | [⚪ 14.0.4](https://github.com/braze-inc/braze-swift-sdk/blob/main/BrazeKit.podspec#L3) |
 
 † Version link points to a specific git tag because the default branch has a newer unreleased version.
 
