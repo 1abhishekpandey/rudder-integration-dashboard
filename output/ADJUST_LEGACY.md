@@ -1,6 +1,6 @@
 Adjust — Legacy SDK Research
 
-Data collected: 2026-03-12
+Data collected: 2026-03-20
 
 # Native Integration
 
