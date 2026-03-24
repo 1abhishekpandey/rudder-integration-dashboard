@@ -1,13 +1,13 @@
 Adjust — Legacy SDK Research
 
-Data collected: 2026-03-12
+Data collected: 2026-03-24
 
 # Native Integration
 
 | Platform | Rudder Integration | Rudder Integration Version | Build File | Vendor Version Range | Latest Vendor Version |
 | --- | --- | --- | --- | --- | --- |
 | Android | [rudder-integration-adjust-android](https://github.com/rudderlabs/rudder-integration-adjust-android) | [2.1.0](https://github.com/rudderlabs/rudder-integration-adjust-android/blob/master/package.json#L2) | [Gradle](https://mvnrepository.com/artifact/com.rudderstack.android.integration/adjust/2.1.0) | [5.1.0](https://github.com/rudderlabs/rudder-integration-adjust-android/blob/master/adjust/build.gradle#L26) | [🔴 5.4.1 †](https://github.com/adjust/android_sdk/blob/v5.4.1/Adjust/build.gradle#L12) |
-| iOS | [rudder-integration-adjust-ios](https://github.com/rudderlabs/rudder-integration-adjust-ios) | [2.2.0](https://github.com/rudderlabs/rudder-integration-adjust-ios/blob/master/package.json#L2) | [Podspec](https://github.com/CocoaPods/Specs/blob/master/Specs/5/b/d/Rudder-Adjust/2.2.0/Rudder-Adjust.podspec.json) | [~> 5.1.0](https://github.com/rudderlabs/rudder-integration-adjust-ios/blob/master/Rudder-Adjust.podspec#L24) | [🟢 5.5.3](https://github.com/adjust/ios_sdk/blob/master/Adjust.podspec#L4) |
+| iOS | [rudder-integration-adjust-ios](https://github.com/rudderlabs/rudder-integration-adjust-ios) | [2.2.0](https://github.com/rudderlabs/rudder-integration-adjust-ios/blob/master/package.json#L2) | [Podspec](https://github.com/CocoaPods/Specs/blob/master/Specs/5/b/d/Rudder-Adjust/2.2.0/Rudder-Adjust.podspec.json) | [~> 5.1.0](https://github.com/rudderlabs/rudder-integration-adjust-ios/blob/master/Rudder-Adjust.podspec#L24) | [🟢 5.5.4](https://github.com/adjust/ios_sdk/blob/master/Adjust.podspec#L4) |
 
 † Version link points to a specific git tag because the default branch has a newer unreleased version.
 
