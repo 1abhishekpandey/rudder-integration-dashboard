@@ -1,15 +1,13 @@
 Firebase — Legacy SDK Research
 
-Data collected: 2026-03-12
+Data collected: 2026-03-29
 
 # Native Integration
 
 | Platform | Rudder Integration | Rudder Integration Version | Build File | Vendor Version Range | Latest Vendor Version |
 | --- | --- | --- | --- | --- | --- |
-| Android | [rudder-integration-firebase-android](https://github.com/rudderlabs/rudder-integration-firebase-android) | [3.5.0](https://github.com/rudderlabs/rudder-integration-firebase-android/blob/master/package.json#L2) | [Gradle](https://mvnrepository.com/artifact/com.rudderstack.android.integration/firebase/3.5.0) | [33.16.0](https://github.com/rudderlabs/rudder-integration-firebase-android/blob/master/firebase/build.gradle#L35) | [🔴 34.10.0](https://firebase.google.com/support/release-notes/android) |
-| iOS | [rudder-integration-firebase-ios](https://github.com/rudderlabs/rudder-integration-firebase-ios) | [3.8.1](https://github.com/rudderlabs/rudder-integration-firebase-ios/blob/master/package.json#L2) | [Podspec](https://github.com/CocoaPods/Specs/blob/master/Specs/6/6/5/Rudder-Firebase/3.8.1/Rudder-Firebase.podspec.json) | [~> 11.15.0](https://github.com/rudderlabs/rudder-integration-firebase-ios/blob/master/Rudder-Firebase.podspec#L6) | [🔴 12.10.0 †](https://github.com/firebase/firebase-ios-sdk/blob/12.10.0/FirebaseAnalytics.podspec#L3) |
-
-† Version link points to a specific git tag because the default branch has a newer unreleased version.
+| Android | [rudder-integration-firebase-android](https://github.com/rudderlabs/rudder-integration-firebase-android) | [3.5.0](https://github.com/rudderlabs/rudder-integration-firebase-android/blob/master/package.json#L2) | [Gradle](https://mvnrepository.com/artifact/com.rudderstack.android.integration/firebase/3.5.0) | [34.11.0](https://github.com/rudderlabs/rudder-integration-firebase-android/blob/master/firebase/build.gradle#L35) | [🟢 34.11.0](https://firebase.google.com/support/release-notes/android) |
+| iOS | [rudder-integration-firebase-ios](https://github.com/rudderlabs/rudder-integration-firebase-ios) | [3.8.1](https://github.com/rudderlabs/rudder-integration-firebase-ios/blob/master/package.json#L2) | [Podspec](https://github.com/CocoaPods/Specs/blob/master/Specs/6/6/5/Rudder-Firebase/3.8.1/Rudder-Firebase.podspec.json) | [~> 11.15.0](https://github.com/rudderlabs/rudder-integration-firebase-ios/blob/master/Rudder-Firebase.podspec#L6) | [🔴 12.11.0](https://github.com/firebase/firebase-ios-sdk/blob/main/FirebaseAnalytics.podspec#L16) |
 
 ---
 
